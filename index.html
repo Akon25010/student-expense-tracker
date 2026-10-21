@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAPKOTA | Student Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="top-bar">
+      <div class="brand">
+        <div class="brand-logo">S</div>
+        <div>
+          <h2>SAPKOTA</h2>
+          <span class="brand-subtitle" data-i18n="brandSubtitle">STUDENT EXPENSE TRACKER</span>
+        </div>
+      </div>
+      <button id="languageToggle" class="language-button" type="button">
+        🇯🇵 日本語
+      </button>
+    </div>
+    <p class="tagline" data-i18n="tagline">Manage your money. Build your future.</p>
+  </header>
+
+  <main class="container">
+    <section class="welcome">
+      <h1 data-i18n="dashboardTitle">My Expense Dashboard</h1>
+      <p data-i18n="dashboardSubtitle">Track your spending and stay within your budget.</p>
+    </section>
+
+    <section class="summary-grid">
+      <div class="summary-card budget-card">
+        <span data-i18n="monthlyBudget">Monthly Budget</span>
+        <h2 id="budgetDisplay">¥0</h2>
+      </div>
+      <div class="summary-card spent-card">
+        <span data-i18n="totalExpenses">Total Expenses</span>
+        <h2 id="spentDisplay">¥0</h2>
+      </div>
+      <div class="summary-card remaining-card">
+        <span data-i18n="remainingMoney">Money Remaining</span>
+        <h2 id="remainingDisplay">¥0</h2>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="setBudget">Set Monthly Budget</h2>
+      <form id="budgetForm">
+        <label for="budget" data-i18n="budgetLabel">Your monthly budget (¥)</label>
+        <div class="form-row">
+          <input id="budget" type="number" min="0" step="1"
+            placeholder="Example: 100000" required>
+          <button type="submit" data-i18n="saveBudget">Save Budget</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="addExpense">Add New Expense</h2>
+      <form id="expenseForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="title" data-i18n="expenseName">Expense Name</label>
+            <input id="title" type="text" placeholder="Example: Lunch" required>
+          </div>
+
+          <div class="form-group">
+            <label for="category" data-i18n="category">Category</label>
+            <select id="category" required>
+              <option value="Food" data-i18n="food">Food</option>
+              <option value="Transport" data-i18n="transport">Transport</option>
+              <option value="Shopping" data-i18n="shopping">Shopping</option>
+              <option value="Education" data-i18n="education">Education</option>
+              <option value="Bills" data-i18n="bills">Bills</option>
+              <option value="Entertainment" data-i18n="entertainment">Entertainment</option>
+              <option value="Other" data-i18n="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="amount" data-i18n="amount">Amount (¥)</label>
+            <input id="amount" type="number" min="0.01" step="0.01"
+              placeholder="Example: 850" required>
+          </div>
+
+          <div class="form-group">
+            <label for="date" data-i18n="date">Date</label>
+            <input id="date" type="date" required>
+          </div>
+        </div>
+        <button type="submit" class="add-button" data-i18n="addButton">+ Add Expense</button>
+      </form>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel">
+      <div class="expense-heading">
+        <h2 data-i18n="expenseHistory">Expense History</h2>
+        <p data-i18n="historySubtitle">Review and manage your spending.</p>
+      </div>
+      <ul id="expenseList" class="expense-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-brand">SAPKOTA</div>
+    <p data-i18n="footerTitle">Student Expense Tracker</p>
+    <p class="copyright">© 2026 SAPKOTA. All rights reserved.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
