@@ -1,157 +1,76 @@
-<<<<<<< HEAD
-
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
-
-const dataFile = path.join(__dirname, "expenses.json");
+const PORT = process.env.PORT || 3000;
+const dataFile = path.join(__dirname, "expense.json");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 function readExpenses() {
-  return JSON.parse(fs.readFileSync(dataFile, "utf8"));
+  try {
+    const data = fs.readFileSync(dataFile, "utf8");
+    return data.trim() ? JSON.parse(data) : [];
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
 }
 
 function saveExpenses(expenses) {
   fs.writeFileSync(dataFile, JSON.stringify(expenses, null, 2));
 }
 
-// Get all expenses
 app.get("/api/expenses", (req, res) => {
-  res.json(readExpenses());
+  try {
+    res.json(readExpenses());
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Could not read expenses." });
+  }
 });
 
-// Add an expense
 app.post("/api/expenses", (req, res) => {
   const { title, category, amount, date } = req.body;
-
-  if (
-    typeof title !== "string" || !title.trim() ||
-    typeof category !== "string" || !category.trim() ||
-    !Number.isFinite(Number(amount)) || Number(amount) <= 0 ||
-    typeof date !== "string" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(date)
-  ) {
-    return res.status(400).json({
-      error: "Please enter valid expense details."
-    });
+  if (typeof title !== "string" || !title.trim() ||
+      typeof category !== "string" || !category.trim() ||
+      !Number.isFinite(Number(amount)) || Number(amount) <= 0 ||
+      typeof date !== "string" || !/\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).json({ error: "Please enter valid expense details." });
   }
-
-  const expenses = readExpenses();
-
-  const expense = {
-    id: Date.now(),
-    title: title.trim(),
-    category: category.trim(),
-    amount: Number(amount),
-    date
-  };
-
-  expenses.push(expense);
-  saveExpenses(expenses);
-
-  res.status(201).json(expense);
+  try {
+    const expenses = readExpenses();
+    const expense = { id: Date.now(), title: title.trim(), category: category.trim(), amount: Number(amount), date };
+    expenses.push(expense);
+    saveExpenses(expenses);
+    res.status(201).json(expense);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Could not save expense." });
+  }
 });
 
-// Delete an expense
 app.delete("/api/expenses/:id", (req, res) => {
-  const expenses = readExpenses();
-
-  const updated = expenses.filter(
-    expense => expense.id !== Number(req.params.id)
-  );
-
-  if (updated.length === expenses.length) {
-    return res.status(404).json({ error: "Expense not found." });
+  try {
+    const expenses = readExpenses();
+    const updated = expenses.filter(e => e.id !== Number(req.params.id));
+    if (updated.length === expenses.length) return res.status(404).json({ error: "Expense not found." });
+    saveExpenses(updated);
+    res.json({ message: "Expense deleted successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Could not delete expense." });
   }
-
-  saveExpenses(updated);
-  res.json({ message: "Expense deleted successfully." });
 });
 
-app.listen(PORT, () => {
-  console.log(`Student Expense Tracker running at http://localhost:${PORT}`);
-});
-=======
+module.exports = app;
 
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-
-const app = express();
-const PORT = 3000;
-
-const dataFile = path.join(__dirname, "expenses.json");
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-
-function readExpenses() {
-  return JSON.parse(fs.readFileSync(dataFile, "utf8"));
+if (require.main === module) {
+  app.listen(PORT, () => console.log("Student Expense Tracker running on port " + PORT));
 }
-
-function saveExpenses(expenses) {
-  fs.writeFileSync(dataFile, JSON.stringify(expenses, null, 2));
-}
-
-// Get all expenses
-app.get("/api/expenses", (req, res) => {
-  res.json(readExpenses());
-});
-
-// Add an expense
-app.post("/api/expenses", (req, res) => {
-  const { title, category, amount, date } = req.body;
-
-  if (
-    typeof title !== "string" || !title.trim() ||
-    typeof category !== "string" || !category.trim() ||
-    !Number.isFinite(Number(amount)) || Number(amount) <= 0 ||
-    typeof date !== "string" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(date)
-  ) {
-    return res.status(400).json({
-      error: "Please enter valid expense details."
-    });
-  }
-
-  const expenses = readExpenses();
-
-  const expense = {
-    id: Date.now(),
-    title: title.trim(),
-    category: category.trim(),
-    amount: Number(amount),
-    date
-  };
-
-  expenses.push(expense);
-  saveExpenses(expenses);
-
-  res.status(201).json(expense);
-});
-
-// Delete an expense
-app.delete("/api/expenses/:id", (req, res) => {
-  const expenses = readExpenses();
-
-  const updated = expenses.filter(
-    expense => expense.id !== Number(req.params.id)
-  );
-
-  if (updated.length === expenses.length) {
-    return res.status(404).json({ error: "Expense not found." });
-  }
-
-  saveExpenses(updated);
-  res.json({ message: "Expense deleted successfully." });
-});
-
-app.listen(PORT, () => {
-  console.log(`Student Expense Tracker running at http://localhost:${PORT}`);
-});
->>>>>>> 84100f16a6292a54a9e82b94f0666b351c164f2b
